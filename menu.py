@@ -29,6 +29,7 @@ loop_info=[
 
 def print_welcome():
     print('### Welcome to the threshold medium diffraction simulator ###')
+    print('For manual mode, edit the script for parameters and run with 1st argument as 0')
 
 
 def print_main_menu():
