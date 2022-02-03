@@ -1,16 +1,10 @@
-import numpy
-
 from diffractsim import colour_functions as cf
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp2d
 from pathlib import Path
 import PIL.ImageOps
 from PIL import Image
-import scipy.integrate as integrate
-
 import numpy as np
-
-import struct
 
 m = 1.
 cm = 1e-2
@@ -25,16 +19,16 @@ class MonochromaticField:
         Initializes the field, representing the cross-section profile of a plane wave
 
         Parameters:
-            wavelength: wavelength of the plane wave
-            extent_x: length of the rectangular grid
-            extent_y: height of the rectangular grid
-            Nx: horizontal dimension of the grid
-            Ny: vertical dimension of the grid
-            intensity: intensity of the field
-            export: path for field output as an image whenever the plot method is used
+            (I) wavelength: wavelength of the plane wave
+            (I) extent_x: length of the rectangular grid
+            (I) extent_y: height of the rectangular grid
+            (I) Nx: horizontal dimension of the grid
+            (I) Ny: vertical dimension of the grid
+            (I) intensity: intensity of the field
+            (I) export: path for field output as an image whenever the plot method is used
         """
         global bd
-        bd = numpy
+        bd = np
 
         self.size = 1
 
@@ -53,11 +47,10 @@ class MonochromaticField:
                              self.Nx)  # Linear space over the x extent containing Nx values
         self.y = bd.linspace(-extent_y / 2, extent_y / 2,
                              self.Ny)  # Linear space over the y extent containing Ny values
-        self.xx, self.yy = bd.meshgrid(self.x,
-                                       self.y)  # Grids defining to the position of a point in the grid within the x or y axis
+        self.xx, self.yy = bd.meshgrid(self.x, self.y)  # Grids defining to the position of a point in the grid within the x or y axis
 
-        self.E = bd.ones((int(self.Ny), int(self.Nx))) * bd.sqrt(
-            intensity)  # Base value of the E field as sqrt of set intensity
+        self.E = bd.ones((int(self.Ny), int(self.Nx))) * bd.sqrt(intensity)  # Base value of the E field as sqrt of set intensity
+        self.I = 0 # Holds the field intensity
         self.λ = wavelength  # Value holding the defined wavelength
         self.intensity = intensity  # Value holding the defined intensity
         self.z = 0  # Value holding the distance of propagation during simulation
@@ -66,6 +59,11 @@ class MonochromaticField:
     def add_rectangular_slit(self, x0, y0, width, height):
         """
         Creates a slit centered at the point (x0, y0) with width width and height height
+        Parameters:
+            (I) x0: x placement of the slit
+            (I) y0: y placement of the slit
+            (I) width: width of the slit
+            (I) height: height of the slit
         """
         t = bd.select(
             [
@@ -82,6 +80,10 @@ class MonochromaticField:
     def add_circular_slit(self, x0, y0, R):
         """
         Creates a circular slit centered at the point (x0,y0) with radius R
+        Parameters:
+            (I) x0: x placement of the slit
+            (I) y0: y placement of the slit
+            (I) R: radius of the slit
         """
 
         t = bd.select(
@@ -95,6 +97,10 @@ class MonochromaticField:
     def add_gaussian_beam(self, w0, x0=0, y0=0):
         """
         Creates a Gaussian beam with radius equal to w0, centered at x0, y0
+        Parameters:
+            (I) w0: beam width
+            (I) x0: x placement of the beam
+            (I) y0: y placement of the beam
         """
 
         r2 = (self.xx - x0) ** 2 + (self.yy + y0) ** 2
@@ -193,13 +199,18 @@ class MonochromaticField:
         self.I = bd.real(self.E * bd.conjugate(self.E))
 
     def add_lens(self, f):
-        """add a thin lens with a focal length equal to f """
+        """
+        Add a thin lens with a focal length equal to f
+        Parameters:
+            (I) f: focal length of the lens
+        """
         self.E = self.E * bd.exp(-1j * bd.pi / (self.λ * f) * (self.xx ** 2 + self.yy ** 2))
 
     def propagate(self, z):
-        """Compute the field in distance equal to z with the angular spectrum method
+        """
+        Compute the field in distance equal to z with the angular spectrum method
         Parameters:
-            z: distance of propagation
+            (I) z: distance of propagation
         """
 
         self.z += z
@@ -232,16 +243,16 @@ class MonochromaticField:
     def get_colors(self):
         """Compute RGB colors"""
 
-        rgb = self.cs.wavelength_to_sRGB(self.λ / nm, 10 * self.I.flatten()).T.reshape(
-            (self.Ny, self.Nx, 3)
-        )
+        rgb = self.cs.wavelength_to_sRGB(self.λ / nm, 10 * self.I.flatten()).T.reshape((self.Ny, self.Nx, 3))
         return rgb
 
     def compute_colors_at(self, z):
-        """Propagate the field to a distance equal to z and compute the RGB colors of the beam profile
+        """
+        Propagate the field to a distance equal to z and compute the RGB colors of the beam profile
 
         Parameters:
-            z: distance of the calculation
+            (I) z: distance of the calculation
+            (O) rgb: rgb matrix of the field, to be used in the plot method
         """
         self.propagate(z)
         rgb = self.get_colors()
@@ -251,11 +262,11 @@ class MonochromaticField:
         """Visualize the diffraction pattern with matplotlib
 
         Parameters:
-            rgb: return of the get_colors function acquired with either the visualize() or compute_colors_at(z) function
-            figsize: (x,y) size of the plot
-            xlim: (-x, x) limits of the plot
-            ylim: (-y, y) limits of the plot
-            export: export path for file with filename and extension, else export as ./last_sim.png
+            (I) rgb: return of the get_colors function acquired with either the visualize() or compute_colors_at(z) function
+            (I) figsize: (x,y) size of the plot
+            (I) xlim: (-x, x) limits of the plot
+            (I) ylim: (-y, y) limits of the plot
+            (I) export: export path for file with filename and extension, else export as ./last_sim.png
         """
 
         # plt.style.use("dark_background")
@@ -298,11 +309,11 @@ class MonochromaticField:
         Add spatial noise following a radial normal distribution
 
         Parameters:
-            noise_radius: maximum radius affected by the spatial noise
-            f_mean: mean spatial frequency of the spatial noise
-            f_size: spread spatial frequency of the noise
-            N: number of samples
-            A: amplitude of the noise
+            (I) noise_radius: maximum radius affected by the spatial noise
+            (I) f_mean: mean spatial frequency of the spatial noise
+            (I) f_size: spread spatial frequency of the noise
+            (I) N: number of samples
+            (I) A: amplitude of the noise
         """
 
         def random_noise(xx, yy, f_mean, A):
@@ -335,15 +346,15 @@ class MonochromaticField:
             Supersamples the phase with gaussian beams
 
             Parameters:
-                Phase: the phase data from LoadFile(path).loadData() function
-                w0: writing gaussian beam width (use x * mm/um/nm)
-                size: data size used
-                sampling: number of pixels supersampling each phase pixel (one axis)
-                threshold: threshold of the beam writing the cell
-                amp_mod: parameter of amplitude or phase modulation in the cell (0-phase, 1-amplitude) with linear change inbetween
-                steps: amount of additional steps between 0 and 1 values in amplitude modulation (amp_mod =1)
-                extended: amount of pixel overlap between cells in the overall pattern
-                verbose: boolean parameter responsible for showing the graphs of the elementary cell and the full field
+                (I) Phase: the phase data (from LoadFile(path).loadData() function)
+                (I) w0: writing gaussian beam width (use x * mm/um/nm)
+                (I) size: data size used (from LoadFile(path).loadData() function or known)
+                (I) sampling: number of pixels supersampling each phase pixel (one axis)
+                (I) threshold: threshold of the beam writing the cell
+                (I) amp_mod: parameter of amplitude or phase modulation in the cell (0-phase, 1-amplitude) with linear change inbetween
+                (I) steps: amount of additional steps between 0 and 1 values in amplitude modulation (amp_mod =1)
+                (I) extended: amount of pixel overlap between cells in the overall pattern
+                (I) verbose: boolean parameter responsible for showing the graphs of the elementary cell and the full field
         """
 
         self.w0 = w0
@@ -355,21 +366,11 @@ class MonochromaticField:
             print("Function argument error!")
             exit()
 
-        """
         # Create a cell of the supersampling
-        cell = bd.ones((sampling, sampling), dtype=complex)
-        side = self.extent_x / size  # Size of one cell
-
-        # Create a x,y space for the cell
-        cell_x = bd.linspace(-side / 2, side / 2, sampling)
-        cell_y = bd.linspace(-side / 2, side / 2, sampling)
-        cell_xx, cell_yy = bd.meshgrid(cell_x, cell_y)
-        """
-
         cell = bd.ones((sampling + 2 * extended, sampling + 2 * extended), dtype=complex)
         side = self.extent_x / size  # Size of one cell
 
-        # Create a x,y space for the cell
+        # Create x,y space for the cell
         ext_mult = (sampling + extended) / sampling
         cell_x = bd.linspace(-side * ext_mult / 2, side * ext_mult / 2, sampling + 2 * extended)
         cell_y = bd.linspace(-side * ext_mult / 2, side * ext_mult / 2, sampling + 2 * extended)
@@ -386,7 +387,7 @@ class MonochromaticField:
         # Adding dampening steps between 1 and 0 values (superpixels)
         if int(amp_mod) is 1:
             for s in range(steps):
-                # Value of the current step following the curve 1/{1+e^[-5(1-(s+1)/(steps+1)-0.6)]}
+                # Value of the current step following the curve 1/{1+e^[-5(0.4-x)]}
                 step_value = 1 / (1 + bd.exp(-5 * (0.4 - (s + 1) / (steps + 1))))
                 cell_copy = bd.copy(cell)
                 for i in range(sampling + 2 * extended):
@@ -423,8 +424,7 @@ class MonochromaticField:
         # Phase binarization to 0 and 1
         Phase[Phase > 0] = 1
 
-        # Zeroing the current field
-        # self.E = bd.zeros(self.E.shape)
+        # "Zeroing" the current field
         self.E = bd.full(self.E.shape, self.intensity * (1 - amp_mod) * bd.exp(complex(0, (bd.pi - amp_mod * bd.pi))))
 
         # Writing cells for High values in the Phase pattern, checking for extended status
@@ -436,7 +436,7 @@ class MonochromaticField:
                             if int(amp_mod) is 1 and extended > 0:  # Handling of the extended method of writing
                                 if (y in [0, size - 1]) or (x in [0, size - 1]):
                                     # Boundary cases written as regular
-                                    if (i >= sampling + extended or j >= sampling + extended):
+                                    if i >= sampling + extended or j >= sampling + extended:
                                         continue
                                     self.E[y * sampling + i - extended][x * sampling + j - extended] += self.intensity * cell[i + extended][j + extended]
                                 else:
@@ -445,6 +445,9 @@ class MonochromaticField:
                             else:  # Regular overwrite method of the necessary hologram points
                                 self.E[y * sampling + i - extended][x * sampling + j - extended] = self.intensity * cell[i][j]
         self.I = bd.real(self.E * bd.conjugate(self.E))
+        # Clip values higher than set max intensity
+        if int(amp_mod) is 1 and extended > 0:
+            self.E[self.E > self.intensity] = self.intensity
 
         # Full pattern plot
         if verbose is True:
@@ -460,7 +463,8 @@ class MonochromaticField:
             plt.show()
 
     def export_E(self):
-        """Exports the current field as a file in Real/Imaginary/Real/... format named 'ReIm.tab'
+        """
+        Exports the current field as a file in Real/Imaginary/Real/... format, named 'ReIm.tab'
         """
         values = []
         for y in range(0, self.Ny):
@@ -477,34 +481,38 @@ class MonochromaticField:
     def spherical_wave(self, r0=(0 * um, 0 * um), z0=1000 * um):
         """Simulates a spherical wave propagating from a point at (x0, y0, z0)
          Parameters:
-            r0 (float, float): (x,y) position of source
-            z0 (float): z position of source
+            (I) r0 (float, float): (x,y) position of source
+            (I) z0 (float): z position of source
         """
         k = 2 * bd.pi / self.λ
         x0, y0 = r0
 
-        R2 = (self.xx - x0) ** 2 + (self.yy - y0) ** 2
+        # R2 = (self.xx - x0) ** 2 + (self.yy - y0) ** 2
         Rz = bd.sqrt((self.xx - x0) ** 2 + (self.yy - y0) ** 2 + z0 ** 2)
         # Modifying the field
         self.E = self.E * bd.exp(-1.j * bd.sign(z0) * k * Rz) / Rz
 
     def spatial_frequency(self, size):
         """
-        Returns the spatial frequency of the pattern
+            Returns the spatial frequency of the image pattern
         """
         angle = bd.arcsin(self.λ / (self.extent_x / size))
         return bd.tan(angle)
 
     def integrate_intensity(self):
+        """
+            Integrates the current field, to be used after the phase_sampling method
+        """
         self.I0 = bd.sum(self.I)
 
     def data_analysis(self, size, order=1, export=False):
         """
         Calculates the diffraction efficiency of the n-th order, contrast and speckle noise of the image
         Parameters:
-            size: data size used
-            order: order of image to analyze
-            export: boolean of data output in array [diff_eff, contrast, speckle]
+            (I) size: data size used
+            (I) order: order of image to analyze
+            (I) export: boolean of data output in array [diff_eff, contrast, speckle]
+            (O) array of statistics [diff_eff, contrast, speckle]
         """
         # Using the spatial frequency to get the pixel size of one image
         freq = self.spatial_frequency(size)
@@ -530,7 +538,10 @@ class MonochromaticField:
                             self.I[y + 1][x] + self.I[y - 1][x] + self.I[y][x + 1] + self.I[y][x - 1])) / 6
                 a += 1  # Updating the iterator
 
-        # if I0 > 0, else inform to integrate intensity
+        # if I0 > 0 continue, else inform to integrate intensity
+        if self.I0 is 0:
+            print("Use MonochromaticField.integrate_intensity() after phase sampling the image.")
+            exit()
 
         # Fraction of intensity in first order of diffraction
         int_1st = I1 / self.I0
