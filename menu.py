@@ -1,5 +1,6 @@
 import easygui
 
+# Variable information for help in the menu
 var_info=[
     "Parameter ssampling refers to the amount of pixels supersampling each point of phase which has to be written, ex. ssampling=16 results in a cell of 16x16.",
     "Wavelength means the wavelength of light used for simulation in nanometers, used values from the visible range (400-700 nm).",
@@ -16,6 +17,7 @@ var_info=[
     "Confirm the displayed parameters."
 ]
 
+# Loop settings information for help in the menu
 loop_info=[
     "Whether the loop is enabled or disabled.",
     "Parameter changing during the loop: \n1-ssampling\t2-wavelength [nm]\t3-distance [cm]\t4-w0 [um]'\n"
@@ -28,11 +30,13 @@ loop_info=[
 
 
 def print_welcome():
+    # Welcome procedure
     print('### Welcome to the threshold medium diffraction simulator ###')
     print('For manual mode, edit the script for parameters and run with 1st argument as 0')
 
 
 def print_main_menu():
+    # Main menu text
     print('1 -- File selection')
     print('2 -- Adjust parameters of simulation')
     print('3 -- Loop settings')
@@ -41,6 +45,7 @@ def print_main_menu():
 
 
 def program_help():
+    # Main menu help
     print("This program is used for analysis of hologram simulations in a medium with threshold intensity writing "
           "using supersampling of each phase pixel.\nDiffraction is calculated with the angular spectrum "
           "method.\nAccepted files are in pairs of float numbers representing real and imaginary value of each "
@@ -48,11 +53,13 @@ def program_help():
 
 
 def invalid_option(options):
+    # Print range of valid options
     message = 'Invalid option. Please enter a number between 1 and {}.'.format(options)
     print(message)
 
 
 def file_selector():
+    # File selector to read
     print('Select file to read')
     path = easygui.fileopenbox()
     print('Selected file:' + path)
@@ -60,32 +67,41 @@ def file_selector():
 
 
 def adjust_variables(names, values):
+    # Print variable names and their values, then the confirm option
     for x in range(12):
         print('{} \t -- \t {} : {}'.format(x + 1, names[x], values[x]))
     print('13 \t -- \t Confirm')
+    # Ask for input
     option = input('Enter option or type ?x for parameter help: ')
     if '?' in option:
+        # Check for help request and print info
         option.replace('?', '')
-        option = int(option[1:])
+        option = int(option[1:])    # Check which variable
         if option < 0 or option > 13:
-            invalid_option(13)
+            invalid_option(13)  # Check range
         else:
+            # Print info
             print(var_info[option-1])
             return values, option
     else:
+        # Handle parameter assignment
         option = int(option)
         if option < 0 or option > 13:
+            # Wrong option
             invalid_option(13)
             return values, option
         elif option is 13:
+            # Return to main menu on confirmation of all parameters
             return values, option
         else:
+            # Assigning new value to the list of values
             print('Change the parameter {}'.format(names[option - 1]))
             values[option - 1] = float(input('Enter new value: '))
             return values, option
 
 
 def loop_setup(names, values):
+    # Procedure the same as with adjust_variables(names, values)
     for x in range(5):
         print('{} \t -- \t {} : {}'.format(x + 1, names[x], values[x]))
     print('6 \t -- \t Confirm')
@@ -114,36 +130,56 @@ def loop_setup(names, values):
 
 
 def run_menu(file_path, sim_names, sim_var, loop_names, loop_var):
-    menu = 1
-    var_list = sim_var
-    loop_list = loop_var
+    """
+        Prints out an interactable menu allowing user to assign values and run the simulation
+        Parameters:
+            (I) file_path: path to the hologram file
+            (I) sim_names: names of the simulation parameters
+            (I) sim_var: values of the simulation parameters
+            (I) loop_names: names of the loop parameters
+            (I) loop_var: values of the loop parameters
+            (O) returns file_path, sim_var and loop_var with new or unchanged values
+    """
+
+    menu = 1    # Menu running when 1
+    var_list = sim_var  # Copy
+    loop_list = loop_var    # Copy
     while menu:
         print_main_menu()
-        option = input('Choose an option or type ?help: ')
+        option = input('Choose an option or type ?help: ')  # User option selection
         if "?help" in option:
+            # Print help
             program_help()
             continue
         else:
+            # Handle choice
             option = int(option)
         if option == 1:
+            # Select file
             file_path = file_selector()
         elif option == 2:
+            # Changing variables
             adjusting = True
             while adjusting is True:
                 var_list, var_input = adjust_variables(sim_names, var_list)
                 if var_input is 13:
+                    # Confirmation of variables
                     adjusting = False
         elif option == 3:
+            # Changing loop setup
             adjusting = True
             while adjusting is True:
                 loop_list , loop_input = loop_setup(loop_names, loop_list)
                 if loop_input is 6:
+                    # Confirmation of loop setup
                     adjusting = False
         elif option == 4:
-            menu = 0
-            return file_path, var_list, loop_list
+            menu = 0    # Shut down the loop
+            return file_path, var_list, loop_list   # Return parameters and start simulation
         elif option == 5:
+            # Exiting program
             print('Exiting program')
             exit()
         else:
+            # Invalid choice
             invalid_option(5)
