@@ -13,7 +13,7 @@ Usage:
 
 Output:
 - in single simulation mode outputs the statistics into the terminal and saves the resulting field into last_sim.png
-- in loop mode saves all results into a date directory with images in format variable=_value_start-time.png and statistics_start-time.txt
+- in loop mode saves all results into a date directory with images in format variable=value_start-time.png and statistics_start-time.txt
 - manual mode saves into a location specified by the user.
 
 Credits:
