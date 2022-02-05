@@ -6,6 +6,7 @@ import PIL.ImageOps
 from PIL import Image
 import numpy as np
 
+
 m = 1.
 cm = 1e-2
 mm = 1e-3
@@ -343,13 +344,13 @@ class MonochromaticField:
     def phase_sampling(self, Phase, w0, size, sampling=16, threshold=0, amp_mod=1, steps=0, extended=False,
                        verbose=False):
         """
-            Supersamples the phase with gaussian beams
+            Oversamples the phase with gaussian beams
 
             Parameters:
                 (I) Phase: the phase data (from LoadFile(path).loadData() function)
                 (I) w0: writing gaussian beam width (use x * mm/um/nm)
                 (I) size: data size used (from LoadFile(path).loadData() function or known)
-                (I) sampling: number of pixels supersampling each phase pixel (one axis)
+                (I) sampling: number of pixels oversampling each phase pixel (one axis)
                 (I) threshold: threshold of the beam writing the cell
                 (I) amp_mod: parameter of amplitude or phase modulation in the cell (0-phase, 1-amplitude) with linear change inbetween
                 (I) steps: amount of additional steps between 0 and 1 values in amplitude modulation (amp_mod =1)
@@ -366,7 +367,7 @@ class MonochromaticField:
             print("Function argument error!")
             exit()
 
-        # Create a cell of the supersampling
+        # Create a cell of the oversampling
         cell = bd.ones((sampling + 2 * extended, sampling + 2 * extended), dtype=complex)
         side = self.extent_x / size  # Size of one cell
 
@@ -589,10 +590,15 @@ class MonochromaticField:
         signal = bd.mean(signal)
         background = bd.mean(background)
 
-        diff_eff = signal_sum / self.I0
+        #diff_eff = signal_sum / self.I0
+        #diff_eff = (I1-I_a.size*background)/self.I0
+
+        # Final statistics
+        diff_eff = (I1-I_a.size*background)/bd.sum(self.I)
         contrast = signal / background
         speckle = deviation / signal
 
+        """
         print("I0=", self.I0, "\tI=", signal_sum, "\tDiffraction efficiency=", "{:.1%}".format(diff_eff))
         print("Average intensity for signal:", signal, "\tbackground:", background, "\tcontrast:", contrast)
         print("Standard deviation for signal: ", deviation, "\tSpeckle ratio:", "{:.1%}".format(speckle))
@@ -604,6 +610,7 @@ class MonochromaticField:
         plt.title("Signal in the first order")
         plt.colorbar()
         plt.show()
+        """
 
         # Table export of data
         if export is True:
