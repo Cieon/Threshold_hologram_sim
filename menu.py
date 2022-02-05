@@ -2,7 +2,7 @@ import easygui
 
 # Variable information for help in the menu
 var_info=[
-    "Parameter ssampling refers to the amount of pixels supersampling each point of phase which has to be written, ex. ssampling=16 results in a cell of 16x16.",
+    "Parameter ssampling refers to the amount of pixels oversampling each point of phase which has to be written, ex. ssampling=16 results in a cell of 16x16.",
     "Wavelength means the wavelength of light used for simulation in nanometers, used values from the visible range (400-700 nm).",
     "Variable extent_x refers to the size of the entire pattern of the written hologram in the x axis in millimeters.",
     "Variable extent_y refers to the size of the entire pattern of the written hologram in the y axis in millimeters.",
@@ -47,7 +47,7 @@ def print_main_menu():
 def program_help():
     # Main menu help
     print("This program is used for analysis of hologram simulations in a medium with threshold intensity writing "
-          "using supersampling of each phase pixel.\nDiffraction is calculated with the angular spectrum "
+          "using overersampling of each phase pixel.\nDiffraction is calculated with the angular spectrum "
           "method.\nAccepted files are in pairs of float numbers representing real and imaginary value of each "
           "hologram pixel.\nExplanations for the meaning of each parameter are included in submenu 2.")
 
