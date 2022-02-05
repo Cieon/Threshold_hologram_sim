@@ -598,7 +598,6 @@ class MonochromaticField:
         contrast = signal / background
         speckle = deviation / signal
 
-        """
         print("I0=", self.I0, "\tI=", signal_sum, "\tDiffraction efficiency=", "{:.1%}".format(diff_eff))
         print("Average intensity for signal:", signal, "\tbackground:", background, "\tcontrast:", contrast)
         print("Standard deviation for signal: ", deviation, "\tSpeckle ratio:", "{:.1%}".format(speckle))
@@ -610,7 +609,6 @@ class MonochromaticField:
         plt.title("Signal in the first order")
         plt.colorbar()
         plt.show()
-        """
 
         # Table export of data
         if export is True:
