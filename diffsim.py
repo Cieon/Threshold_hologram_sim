@@ -108,9 +108,9 @@ if menu is 1:
     # METHOD DESCRIPTIONS ABOVE AND IN MONOCHROMATIC_SIMULATOR.PY
 
     F = MonochromaticField(wavelength= WAVELENGTH * nm, extent_x= SIZE IN X AXIS * mm, extent_y= SIZE IN Y AXIS * mm,
-                           Nx=size * SUPERSAMPLING, Ny=size * SUPERSAMPLING, intensity= INTENSITY(0.1 DEFAULT))
+                           Nx=size * OVERSAMPLING, Ny=size * OVERSAMPLING, intensity= INTENSITY(0.1 DEFAULT))
     F.phase_sampling(Phase (LOADED FROM FILE), w0= BEAM WIDTH * mm, size=size (LOADED FROM FILE),
-                    sampling= SUPERSAMPLING, threshold=(0-1 VALUE), amp_mod=(0-1 VALUE), steps=(0-X VALUE),
+                    sampling= OVERSAMPLING, threshold=(0-1 VALUE), amp_mod=(0-1 VALUE), steps=(0-X VALUE),
                     extended=(0-X VALUE), verbose=(0 OR 1 VALUE))
     F.spherical_wave(DISTANCE * cm)
     F.integrate_intensity()
@@ -143,9 +143,9 @@ if menu is 1:
 x = STARTING VALUE
 while (x <= LAST VALUE):
     F = MonochromaticField(wavelength= WAVELENGTH * nm, extent_x= SIZE IN X AXIS * mm, extent_y= SIZE IN Y AXIS * mm,
-                           Nx=size * SUPERSAMPLING, Ny=size * SUPERSAMPLING, intensity= INTENSITY(0.1 DEFAULT))
+                           Nx=size * OVERSAMPLING, Ny=size * OVERSAMPLING, intensity= INTENSITY(0.1 DEFAULT))
     F.phase_sampling(Phase (LOADED FROM FILE), w0= BEAM WIDTH * mm, size=size (LOADED FROM FILE),
-                    sampling= SUPERSAMPLING, threshold=(0-1 VALUE), amp_mod=(0-1 VALUE), steps=(0-X VALUE),
+                    sampling= OVERSAMPLING, threshold=(0-1 VALUE), amp_mod=(0-1 VALUE), steps=(0-X VALUE),
                     extended=(0-X VALUE), verbose=(0 OR 1 VALUE))
     F.spherical_wave(DISTANCE * cm)
     F.integrate_intensity()
