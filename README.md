@@ -1,5 +1,5 @@
 # Threshold_hologram_sim
-This program is used for analysis of hologram simulations in a medium with threshold intensity writing using supersampling of each phase pixel. Diffraction is calculated with the angular spectrum method. Accepted files are in pairs of float numbers representing real and imaginary value of each hologram pixel. Explanations for the meaning of each parameter are included in submenu 2.
+This program is used for analysis of hologram simulations in a medium with threshold intensity writing using oversampling of each phase pixel. Diffraction is calculated with the angular spectrum method. Accepted files are in pairs of float numbers representing real and imaginary value of each hologram pixel. Explanations for the meaning of each parameter are included in submenu 2.
 
 Requiremets:
 - Python 3.7
